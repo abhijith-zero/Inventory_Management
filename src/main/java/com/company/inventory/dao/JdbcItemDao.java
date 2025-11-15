@@ -97,4 +97,37 @@ public class JdbcItemDao implements ItemDao {
         if (!rs.wasNull()) it.setReorderLevel(r);
         return it;
     }
+    // src/main/java/com/company/inventory/dao/JdbcItemDao.java
+    @Override
+    public Long update(Item item) throws Exception {
+        if (item.getId() == null) throw new IllegalArgumentException("Item id is required for update");
+
+        // check SKU uniqueness (other than this id)
+        String skuCheck = "SELECT id FROM item WHERE sku = ? AND id <> ?";
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(skuCheck)) {
+            ps.setString(1, item.getSku());
+            ps.setLong(2, item.getId());
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) throw new IllegalArgumentException("SKU already used by another item: " + item.getSku());
+            }
+        }
+
+        String sql = "UPDATE item SET name = ?, sku = ?, category_id = ?, supplier_id = ?, purchase_price = ?, sale_price = ?, reorder_level = ? WHERE id = ?";
+        try (Connection c = ds.getConnection();
+             PreparedStatement ps = c.prepareStatement(sql)) {
+            ps.setString(1, item.getName());
+            ps.setString(2, item.getSku());
+            if (item.getCategoryId() != null) ps.setLong(3, item.getCategoryId()); else ps.setNull(3, Types.BIGINT);
+            if (item.getSupplierId() != null) ps.setLong(4, item.getSupplierId()); else ps.setNull(4, Types.BIGINT);
+            if (item.getPurchasePrice() != null) ps.setDouble(5, item.getPurchasePrice()); else ps.setNull(5, Types.DECIMAL);
+            if (item.getSalePrice() != null) ps.setDouble(6, item.getSalePrice()); else ps.setNull(6, Types.DECIMAL);
+            if (item.getReorderLevel() != null) ps.setInt(7, item.getReorderLevel()); else ps.setNull(7, Types.INTEGER);
+            ps.setLong(8, item.getId());
+            int updated = ps.executeUpdate();
+            if (updated == 0) throw new IllegalArgumentException("Item not found with id: " + item.getId());
+            return item.getId();
+        }
+    }
+
 }

@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("Starting Inventory Management System...");
 
         // Initialize database and run migrations
@@ -39,7 +39,7 @@ public class Main {
 
         Scanner sc = new Scanner(System.in);
         while (true) {
-            System.out.println("\nMenu: 1) Add item  2) List items  0) Exit");
+            System.out.println("\nMenu: 1) Add item  2) List items 3) Update Items  0) Exit");
             String opt = sc.nextLine();
             if ("0".equals(opt)) break;
             if ("1".equals(opt)) {
@@ -61,6 +61,41 @@ public class Main {
             } else if ("2".equals(opt)) {
                 service.listItems().forEach(System.out::println);
             }
+            else if ("3".equals(opt)) {
+                    System.out.print("Item id to update: ");
+                    long id = Long.parseLong(sc.nextLine().trim());
+                    System.out.print("New name (leave empty to keep): ");
+                    String name = sc.nextLine().trim();
+                    System.out.print("New SKU (leave empty to keep): ");
+                    String sku = sc.nextLine().trim();
+                    System.out.print("Category ID (leave empty for null): ");
+                    String cat = sc.nextLine().trim();
+                    System.out.print("Supplier ID (leave empty for null): ");
+                    String sup = sc.nextLine().trim();
+                    System.out.print("Purchase price (leave empty for null): ");
+                    String pp = sc.nextLine().trim();
+                    System.out.print("Sale price (leave empty for null): ");
+                    String sp = sc.nextLine().trim();
+                    System.out.print("Reorder level (leave empty for null): ");
+                    String rl = sc.nextLine().trim();
+
+                    Item item = itemDao.findById(id).orElseThrow(() -> new RuntimeException("Item not found: " + id));
+                    if (!name.isEmpty()) item.setName(name);
+                    if (!sku.isEmpty()) item.setSku(sku);
+                    item.setCategoryId(cat.isEmpty() ? null : Long.valueOf(cat));
+                    item.setSupplierId(sup.isEmpty() ? null : Long.valueOf(sup));
+                    item.setPurchasePrice(pp.isEmpty() ? null : Double.valueOf(pp));
+                    item.setSalePrice(sp.isEmpty() ? null : Double.valueOf(sp));
+                    item.setReorderLevel(rl.isEmpty() ? null : Integer.valueOf(rl));
+
+                    try {
+                        service.updateItem(item);
+                        System.out.println("Updated item " + id);
+                    } catch (Exception e) {
+                        System.err.println("Failed to update item: " + e.getMessage());
+                    }
+                }
+
         }
 
         System.out.println("Goodbye");
