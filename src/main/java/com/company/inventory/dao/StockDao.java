@@ -1,9 +1,13 @@
 package com.company.inventory.dao;
 
+import com.company.inventory.model.Stock;
+
+import java.util.Optional;
+
 public interface StockDao {
 
-    void upsertStock(long itemId, long warehouseId, int qty) throws Exception;
+    Stock upsertStock(Stock stock) ;
 
 
-    int getQuantity(long itemId, long warehouseId) throws Exception;
+    Optional<Stock> getStock(Long itemId);
 }

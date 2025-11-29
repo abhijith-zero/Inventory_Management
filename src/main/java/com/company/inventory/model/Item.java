@@ -1,9 +1,8 @@
 package com.company.inventory.model;
 
-public class Item {
-    private Long id;
+public class Item extends BaseEntity {
     private String name;
-    private String sku;
+    private Sku sku;
     private Long categoryId;
     private Long supplierId;
     private Double purchasePrice;
@@ -12,12 +11,12 @@ public class Item {
 
     public Item() {}
 
-    public Item(String name, String sku) {
+    public Item(String name, Sku sku) {
         this(null, name, sku,null,null,null,null,null);
     }
 
-    public Item(Long id, String name, String sku,Long categoryId,Long supplierId, Double purchasePrice, Double salePrice, Integer reorderLevel) {
-        this.id = id;
+    public Item(Long id, String name, Sku sku,Long categoryId,Long supplierId, Double purchasePrice, Double salePrice, Integer reorderLevel) {
+        this.id=id;
         this.name = name;
         this.sku = sku;
         this.categoryId=categoryId;
@@ -28,21 +27,18 @@ public class Item {
     }
 
     // getters and setters
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
 
-    public String getSku() { return sku; }
-    public void setSku(String sku) { this.sku = sku; }
+    public Sku getSku() { return sku; }
+    public void setSku(Sku sku) { this.sku = sku; }
 
     public Long getCategoryId() { return categoryId; }
     public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
 
     public Long getSupplierId() { return supplierId; }
     public void setSupplierId(Long supplierId) { this.supplierId = supplierId; }
-
 
     public Double getPurchasePrice() { return purchasePrice; }
     public void setPurchasePrice(Double purchasePrice) { this.purchasePrice = purchasePrice; }

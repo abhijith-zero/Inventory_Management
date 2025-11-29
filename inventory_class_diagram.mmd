@@ -1,0 +1,88 @@
+classDiagram
+    %% Enums
+    class MovementType {
+        <<enumeration>>
+        IN
+        OUT
+    }
+
+    %% Classes
+    class BaseEntity {
+        <<Abstract>>
+        +Long id
+        +LocalDateTime createdAt
+        +LocalDateTime updatedAt
+    }
+
+    class Item {
+        +String name
+        +Sku sku
+        +Long categoryId
+        +Long supplierId
+        +Double purchasePrice
+        +Double salePrice
+        +Integer reorderLevel
+    }
+
+    class Sku {
+        +String value
+        +Sku(String value)
+        +boolean equals(Object o)
+        +String toString()
+    }
+
+    class Stock {
+        +Long itemId
+        +int quantity
+        +void increase(int delta)
+        +void decrease(int delta)
+        +int getQuantity()
+    }
+
+    class StockMovement {
+        <<Abstract>>
+        +Long id
+        +Long itemId
+        +int qty
+        +MovementType type
+        +String reason
+        +LocalDateTime timestamp
+        +void applyTo(Stock stock)
+    }
+
+    class StockInMovement {
+        +void applyTo(Stock stock)
+    }
+
+    class StockOutMovement {
+        +void applyTo(Stock stock)
+    }
+
+    class StockMovementDao {
+        <<Interface>>
+        +void recordMovement(StockMovement movement)
+        +List~StockMovement~ listByItem(Long itemId)
+    }
+
+    class StockMovementDaoJdbc {
+        -final String INSERT_SQL
+        -final String SELECT_BY_ITEM
+        +void recordMovement(StockMovement movement)
+        +List~StockMovement~ listByItem(Long itemId)
+    }
+
+    %% Relationships
+    BaseEntity <|-- Item
+    BaseEntity <|-- Stock
+    BaseEntity <|-- StockMovement
+
+    StockMovement <|-- StockInMovement
+    StockMovement <|-- StockOutMovement
+
+    StockMovementDao <|-- StockMovementDaoJdbc
+
+    Item "1" *-- "0..*" StockMovement : has
+    Item "1" *-- "1" Stock : has
+    Item "1" *-- "1" Sku : has
+
+    StockMovement "1" -- "1" Stock : affects
